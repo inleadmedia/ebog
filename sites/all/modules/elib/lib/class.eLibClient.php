@@ -157,7 +157,7 @@ class eLibClient{
 	  	
 	  	$params = $this->elibUsr->loginParams();
 	  	$params['ebookid'] = $ebookid;
-	  	$params['format'] = '230';
+	  	$params['format'] = '58';
 	  	$params['mobipocketid'] = '';
 
 		//watchdog('elib', 'eLib SOAP (makeLoan): “@message”', array('@message' => var_export($params,true), WATCHDOG_DEBUG));

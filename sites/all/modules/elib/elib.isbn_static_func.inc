@@ -40,8 +40,11 @@ function convertFromIsbn13ToIsbn10($isbn13OrEAN)
   $isbnLen=strlen($isbn13OrEAN);
   if ($isbnLen!=13)
   {
-    //Invalid length
-    return false;
+    /** Invalid length, but return input isbn back. 
+     * This is required for the case when we get isbn in this format: xx-xxxx-xxx-x
+     * And will return just 10 digits isbn without '-' sign
+     */
+    return $isbn13OrEAN;
   }
 
   $isbn10 = substr($isbn13OrEAN,3,9);

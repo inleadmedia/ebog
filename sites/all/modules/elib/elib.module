@@ -95,7 +95,11 @@ function elib_get_isbn_from_object_id($oid){
   module_load_include('isbn_static_func.inc', 'elib');
   try {
     $object = ting_get_object_by_id($oid);
-    $isbn = convertFromIsbn13ToIsbn10($object->record['dc:identifier']['dkdcplus:ISBN'][0]);
+    if (strlen($object->record['dc:identifier']['dkdcplus:ISBN'][0]) == 13) {
+      $isbn = convertFromIsbn13ToIsbn10($object->record['dc:identifier']['dkdcplus:ISBN'][0]);
+    } else {
+      $isbn = $object->record['dc:identifier']['dkdcplus:ISBN'][0];
+    }
     
     /*$eliburl = $object->record['dc:identifier']['dcterms:URI'][0];
     $first = substr($eliburl,strpos($eliburl,'&id=')+4);
@@ -326,14 +330,9 @@ function elib_get_lydbog($tingObjectID,$format){
 			if($response->status->code == 101){
 			 $src = $response->data->downloadurl;
 			 $pretext = '<h1 style="text-align:center;">Din lydbog afspilles nu nedenfor</h1>';
-			if($format != 'stream'){
-       $src = (trim($response->data[1]->files[0]->file));
-       global $base_root;
-       $pretext = '<h1 style="text-align:center;">Vi er ved at generere din lydbog.<br/> Vent venligst...</h1><div class="loader"></div><p>Vi er ved at pakke din lydbog til en fil</p><p>Når du har gemt filen, tryk næste</p>'.l('Næste',$base_root.request_uri(),array('query'=> 'downloaded=1','attributes' => array('class' => 'nextknap knap')));
-      }
       
         $content = $pretext;
-			 $content .= '<iframe src="'.$src.'" class="audioplayer-'.$format.'" scrolling="no"></iframe>';
+        $content .= l("Link", $src, array('html' => true));        
 			}
 			
 			
@@ -776,8 +775,10 @@ function elib_get_sample($tingObjectID) {
 function elib_book_teaser(TingClientObject $object, $is_ajax = false) {
   module_load_include('isbn_static_func.inc', 'elib');
   $isbn = preg_replace('/[^0-9]+/', '', $object->record['dc:identifier']['dkdcplus:ISBN'][0]);
-  $isbn = convertFromIsbn13ToIsbn10($isbn);
 
+  if (strlen($isbn) == 13) { 
+    $isbn = convertFromIsbn13ToIsbn10($isbn);
+  }
   $c = elib_client();
   $c->setLibrary(variable_get('elib_retailer_id', ''));
   try {
